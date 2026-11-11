@@ -18,6 +18,36 @@ be replayed (clearly labelled). The presenter must be able to show historical de
 checkpoints without interrupting the running solver. It is for historical puzzles and education
 only, and must treat Advent of Code respectfully."
 
+## Clarifications
+
+### Session 2026-11-11
+
+> Provenance: `/speckit-clarify` was run by the implementing agent (Claude Code). The operator
+> instructed the agent not to re-ask decisions already made in the feature brief and to make
+> remaining reasonable decisions independently. No stakeholder conversation took place. Each answer
+> below is the agent's recommended option, chosen on the basis noted in brackets.
+
+- Q: What minimum interval should separate consecutive automated requests to the Advent of Code
+  website? → A: 5 seconds by default (configurable, lower bound 1 s), strictly sequential; a
+  `Retry-After` or cooldown always takes precedence. [Agent decision: the website publishes no
+  interval for puzzle/input/answer requests; the 15-minute guidance applies only to private
+  leaderboard JSON; 5 s keeps a full day at ~10 requests well under a minute of overhead.]
+- Q: When a part exhausts its attempts or is otherwise unsolvable, should the run stop or move on?
+  → A: Mark the part FAILED, mark that day's dependent Part 2 BLOCKED, and continue with the next
+  day. [Agent decision: historical days are independent, so stopping would waste the demo.]
+- Q: How many real answer submissions may the agent make for a single part? → A: At most 3 distinct
+  submissions per part by default (configurable); after the limit the part becomes FAILED and
+  needs an operator retry. [Agent decision: prevents using the website as a guessing oracle while
+  allowing recovery from a genuine misreading.]
+- Q: While a submission cooldown is active, should the agent start work on other parts? → A: No. It
+  continues diagnosis of the same part only (local work is allowed), then waits for the deadline
+  before submitting; it does not jump ahead. [Agent decision: keeps progress strictly chronological
+  and the dashboard easy to follow.]
+- Q: How should Day 25's second star be handled? → A: After Day 25 Part 1 is accepted, the agent
+  claims the second star automatically only if the account then holds all 49 other stars;
+  otherwise Part 2 is marked SKIPPED with the reason. [Agent decision: mirrors the website's rule
+  and avoids a pointless submission.]
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Autonomous live solving with real submission (Priority: P1)
@@ -114,8 +144,8 @@ context, that its program is tested normally, and that an escalation event with 
 2. **Given** an attempt timed out in the sandbox, **When** escalation policy allows early escalation
    for complexity failures, **Then** the agent may escalate before the normal threshold.
 3. **Given** the total attempt limit for a part is reached, **When** no attempt succeeded, **Then**
-   the part becomes "failed" and the run continues to whatever work remains possible (or stops if
-   later parts depend on it).
+   the part becomes FAILED, the same day's Part 2 (if not yet accessible) becomes BLOCKED, and the
+   run continues with the next day.
 
 ---
 
@@ -222,7 +252,8 @@ and back; verify the solver's event stream continues uninterrupted and its data 
 ### Edge Cases
 
 - Day 25 has a single puzzle; its second star is granted only when all other 49 stars are earned and
-  is claimed rather than solved.
+  is claimed rather than solved. The agent claims it only when the account holds the other 49
+  stars; otherwise Day 25 Part 2 is SKIPPED with that reason.
 - Puzzles whose examples have no reliably identifiable expected output: the agent proceeds with
   sanity checks only and records that example validation was unavailable.
 - Multiple examples per part, examples with different parameters than the real input (e.g., grid
@@ -232,8 +263,8 @@ and back; verify the solver's event stream continues uninterrupted and its data 
 - The website returns an unexpected page, a login page (expired session), or a server error.
 - A part becomes accessible unexpectedly (completed elsewhere during the run): the agent reconciles
   state and skips it.
-- Repeated cooldowns: waiting time grows; the run keeps working on non-submission activities only
-  where those are useful, otherwise waits.
+- Repeated cooldowns: waiting time grows; the agent continues diagnosis of the same part only and
+  then waits for the deadline; it never starts a later part while a cooldown is pending.
 - The selected range starts at a day whose earlier days are incomplete (Advent of Code historical
   days are all open, so this is allowed).
 - Budget is exhausted mid-attempt; a model call is in flight when the operator pauses.
@@ -253,8 +284,9 @@ and back; verify the solver's event stream continues uninterrupted and its data 
 - **FR-003**: The system MUST offer a manual-approval mode in which candidate answers wait for the
   operator, and MUST explain that disabling submission halts progression to locked Part 2 puzzles.
 - **FR-004**: Operators MUST be able to configure limits: attempts per part (default 6), failures
-  before escalation (default 3), execution timeout (default 30 s, with a configurable maximum),
-  maximum spend per run, and the website request pacing.
+  before escalation (default 3), distinct submissions per part (default 3), execution timeout
+  (default 30 s, with a configurable maximum), maximum spend per run, and the website request
+  pacing (default minimum interval 5 s, never below 1 s).
 - **FR-005**: The system MUST validate the account session before a live run begins and refuse to
   start a live run with an invalid session.
 
@@ -287,8 +319,9 @@ and back; verify the solver's event stream continues uninterrupted and its data 
   concise handover summary rather than the full conversation.
 - **FR-015**: The system MUST track three distinct success levels per part — tests passed, candidate
   generated, accepted by Advent of Code — and only the last counts as earned progress.
-- **FR-016**: The system MUST mark a part "failed" when the attempt limit is reached and "blocked"
-  when it cannot proceed for an external reason (e.g. dependency failed, session invalid).
+- **FR-016**: The system MUST mark a part FAILED when its attempt or submission limit is reached and
+  BLOCKED when it cannot proceed for an external reason (e.g. Part 1 failed, session invalid); after
+  a FAILED or BLOCKED part the run MUST continue with the next day.
 
 **Submission**
 
@@ -300,11 +333,13 @@ and back; verify the solver's event stream continues uninterrupted and its data 
 - **FR-019**: The system MUST NEVER submit an answer identical to one already rejected for the same
   part, and MUST use too-high/too-low bounds to discard candidates outside known bounds.
 - **FR-020**: The system MUST persist cooldown deadlines and not submit before they expire;
-  application retries MUST be independent of website cooldowns.
+  application retries MUST be independent of website cooldowns. During a cooldown the agent MAY
+  continue local diagnosis of the same part but MUST NOT start a later part.
 - **FR-021**: If a submission outcome is uncertain, the system MUST reconcile against the day's
   completion state before any further submission for that part.
 - **FR-022**: On acceptance of Part 1 the system MUST fetch Part 2 and continue; on acceptance of
-  Part 2 (or Day 25's final claim) it MUST advance to the next day.
+  Part 2 (or Day 25's final claim) it MUST advance to the next day. Day 25 Part 2 MUST be claimed
+  only when the account holds the other 49 stars, otherwise marked SKIPPED with the reason.
 
 **Execution sandbox**
 
