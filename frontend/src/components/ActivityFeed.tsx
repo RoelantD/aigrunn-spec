@@ -66,14 +66,14 @@ export function ActivityFeed({
         return (
           <li key={e.id} className="animate-slide-in">
             {header && (
-              <div className={cx('mt-3 mb-1 font-mono font-semibold text-ink-300', large ? 'text-lg' : 'text-xs')}>{header}</div>
+              <div className={cx('mt-3 mb-1 font-mono font-semibold text-ink-300', large ? 'text-2xl' : 'text-xs')}>{header}</div>
             )}
             <div
               className={cx(
                 'flex items-start gap-2.5 rounded-md px-2 py-1',
                 e.type === 'star.earned' && 'bg-star/10',
                 e.type === 'agent.escalation' && 'bg-opus/10',
-                large ? 'text-xl leading-snug' : 'text-sm',
+                large ? 'text-2xl leading-snug' : 'text-sm',
               )}
             >
               <span className="mt-0.5 shrink-0">{iconFor(e)}</span>

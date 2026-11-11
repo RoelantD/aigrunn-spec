@@ -235,5 +235,5 @@ then T028 → T033 → T036 → T037 → T038 → T039 → T040/T041
 
 ## Phase 12: Convergence
 
-- [ ] T091 Raise presentation-view activity text to at least 24 px (currently 20 px) per SC-010 (partial)
-- [ ] T092 Document the emitted event types agent.step, exec.started, test.note, model.note, part.failed, part.skipped, part.retry in contracts/events.md per FR-030 (partial)
+- [X] T091 Raise presentation-view activity text to at least 24 px (currently 20 px) per SC-010 (partial)
+- [X] T092 Document the emitted event types agent.step, exec.started, test.note, model.note, part.failed, part.skipped, part.retry in contracts/events.md per FR-030 (partial)
