@@ -1,6 +1,6 @@
 # Test status and verification record
 
-As of 2026-11-11, at checkpoint `demo/07-complete`.
+As of 2026-11-11, at checkpoint `demo/07-complete`. `/speckit-converge` pass 3 found no remaining gaps.
 
 ## Automated suites (run, all passing)
 
@@ -12,7 +12,7 @@ As of 2026-11-11, at checkpoint `demo/07-complete`.
 | Frontend type-check + production build | `cd frontend && npm run build` | succeeds |
 | Bicep compile | `az bicep build --file infra/main.bicep` | succeeds (warnings: local Bicep 0.40 lacks types for `sessionPools@2026-07-01` and `modelProviderData`) |
 | PowerShell scripts parse | PowerShell parser over `scripts/*.ps1` | no errors |
-| Worktree/checkpoint scripts | `setup-demo.ps1`, `show-checkpoint.ps1` (every tag), `return-to-complete.ps1`, with the dirty-tree guard | exercised locally, see the bottom of this file |
+| Worktree/checkpoint scripts | `setup-demo.ps1`, `show-checkpoint.ps1` (tags 00-06), dirty-tree guard | exercised locally, see the bottom of this file |
 
 The automated tests use **synthetic puzzles**, a stateful **fake Advent of Code website**, **scripted
 model providers** and a **fake executor** that never runs code. No test submits a real answer or needs
@@ -75,5 +75,3 @@ scratch demo root (`APS_DEMO_ROOT`):
   `APS_ENV_FILE`/`APS_DATA_DIR`. `/api/health` was OK, and `solver.db` was created in `aps-data`.
 - `start-live-app.ps1` opens two console windows. Its commands are the ones exercised above, but the
   windowed launcher itself was not run unattended.
-- After `demo/07-complete` was tagged, `setup-demo.ps1` was run for real next to the repository
-  (see the final commit message for its result).
