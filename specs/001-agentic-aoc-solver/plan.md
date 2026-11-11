@@ -43,7 +43,8 @@ Azure for models and sandbox
 **Performance Goals**: Dashboard event latency < 2 s (SC-004); no artificial delays in local
 steps; AoC requests ≥ 5 s apart (configurable, floor 1 s)
 
-**Constraints**: Sandbox per-execution timeout default 30 s, max 220 s; ≤ 3 distinct submissions
+**Constraints**: Sandbox per-execution timeout default 30 s, configured maximum 120 s (operator may
+raise it up to the platform ceiling of 220 s); ≤ 3 distinct submissions
 per part; ≤ 6 attempts per part; configurable spend cap; secrets never leave the backend
 
 **Scale/Scope**: Single operator, one active live run at a time, 25 days × 2 parts, tens of
@@ -100,7 +101,12 @@ NOT_STARTED → FETCHING → ANALYZING → GENERATING → TESTING ─pass→ EXE
   escalation when the last failure was a timeout and `escalate_on_timeout` is true (from attempt 2).
 - Infra errors (HTTP 429/5xx/network to Foundry or Dynamic Sessions) are retried by the adapter with
   exponential backoff honoring `Retry-After` (max 5 tries) and do **not** consume attempts; if the
-  retries are exhausted the part is BLOCKED with `infra_error` and the run pauses (not fails).
+  retries are exhausted the **run pauses** (event `run.paused`, reason `infra_error`) and the part
+  keeps a resumable state with `status_reason=infra_error`. BLOCKED is reserved for problem or
+  dependency causes (FR-016), so an outage never cascades BLOCKED across later days.
+- Hardcoded-answer guard (Constitution I): code whose source contains a literal equal to a
+  previously known/rejected answer, or that returns the same answer for every example where
+  different expected outputs exist, is rejected as a failed attempt with feedback.
 - Wrong answer: the rejected answer and its bound (too high/low) go into the answer ledger; the next
   attempt receives the feedback; any candidate equal to a rejected answer or outside known bounds
   is not submitted (counts as a failed attempt with feedback "answer previously rejected").
