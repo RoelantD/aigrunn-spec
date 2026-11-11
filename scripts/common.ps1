@@ -10,6 +10,7 @@ $Script:EnvFile      = Join-Path $Script:DataDir '.env'
 $Script:BackendPort  = 8765
 $Script:FrontendPort = 5175
 $Script:FinalTag     = 'demo/07-complete'
+$Script:LiveBranch   = 'main'   # live app follows main: demo/07-complete + fixes from live verification
 
 $Script:Checkpoints = [ordered]@{
     'initial'      = 'demo/00-initial'

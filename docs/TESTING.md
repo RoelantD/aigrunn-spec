@@ -6,7 +6,7 @@ As of 2026-11-11, at checkpoint `demo/07-complete`. `/speckit-converge` pass 3 f
 
 | Suite | Command | Result |
 |-------|---------|--------|
-| Backend unit + integration + e2e | `cd backend && uv run pytest` | **79 passed** (4 live tests deselected) |
+| Backend unit + integration + e2e | `cd backend && uv run pytest` | **79 passed** (4 live tests deselected; run separately, see below) |
 | Backend lint | `cd backend && uv run ruff check .` | clean |
 | Frontend unit/component | `cd frontend && npm test` | **5 passed** |
 | Frontend type-check + production build | `cd frontend && npm run build` | succeeds |
@@ -38,27 +38,24 @@ as follows:
 
 ## Integrations against real services
 
-| Integration | Status | Notes |
-|-------------|--------|-------|
-| Advent of Code: logged-out page structure, the 400 for input without a session, calendar classes | **Verified live (read-only)** during research on 2026-11-11 | No login and no submission |
-| Advent of Code: authenticated pages, answer submission, response wording | **UNVERIFIED live.** Built from public client source code and fixtures (aocd, advent-of-code-api) and tested against the fake site | First verification happens at the presenter's preflight and test start |
-| Microsoft Foundry Responses API (GPT-6.1 Sol) | **UNVERIFIED live.** Request and response shapes come from the docs and are tested with mocks | The subscription used during development had no `gpt-6.1-sol` deployment. Run `pytest -m live_azure` after `azd provision` |
-| Claude Messages API in Foundry (Claude Opus 5.5) | **UNVERIFIED live.** Same as above; `output_config.format` has an automatic fallback | Same |
-| Azure Container Apps Dynamic Sessions | **UNVERIFIED live.** Shapes come from the REST reference; the wrapped and flat request bodies are both handled | No session pool existed in the development subscription |
-| Bicep deployment | **NOT DEPLOYED.** Compiled only | Creating cloud resources needs the operator's authorization |
-| Entra ID token acquisition (`DefaultAzureCredential`) | Not exercised against these resources | |
+Live verification ran on 2026-11-11, after `demo/07-complete`, against `aif-grunn` and session pool
+`apspoolnzl7h6ahxaqa` in `rg-aigrunn` (Sweden Central), using Entra ID authentication:
 
-Opt-in live tests, which need the resources above and never touch Advent of Code:
+| Integration | Status | Evidence |
+|-------------|--------|----------|
+| Microsoft Foundry Responses API (GPT-6.1 Sol, deployment `gpt-6.1-sol`) | **Verified live** | Preflight ping (~2.9 s). `test_live_azure.py` solved both parts of an unfamiliar synthetic puzzle |
+| Claude Messages API in Foundry (Claude Opus 5.5, `claude-opus-5-5`) | **Verified live** | Preflight ping (~2.0 s). A forced escalation produced a correct Part 1 solution. `output_config.format` was accepted, so the fallback was not needed |
+| Azure Container Apps Dynamic Sessions | **Verified live** | Harness executed example and real-input runs. The egress probe showed `1.1.1.1` and `adventofcode.com` both blocked |
+| Entra ID tokens (`azure.identity.aio`) | **Verified live** | First real use found a missing dependency (`aiohttp`), now fixed |
+| Bicep / azd | **Deployed**, reusing an existing RG and Foundry account | `azd provision` created the session pool and 3 role assignments |
+| Advent of Code: logged-out structure, the 400 for input without a session | Verified live (read-only) during research | |
+| Advent of Code: authenticated pages, answer submission, response wording | **UNVERIFIED live** | `AOC_SESSION` was not configured during verification. First check is at the presenter's preflight and test start |
 
-```bash
-cd backend
-uv run python cli.py preflight --days 1-5          # real AoC session check + both models + sandbox (no submission)
-uv run pytest -m live_azure tests/live -s          # an unfamiliar synthetic puzzle solved by the real models in the real sandbox,
-                                                   # including a forced escalation to Claude Opus 5.5
-```
+Opt-in live test results (`uv run pytest -m live_azure tests/live`): **4 passed in 57 s**. Bugs these
+runs found and fixed on `main` after the `demo/07-complete` tag:
 
-**Not executed**: `tests/live/test_live_azure.py` (all 4 tests) and the preflight against real
-services. Both are blocked on provisioning.
+- `azure.identity.aio` needs `aiohttp`, which was missing.
+- Credential HTTP sessions were never closed, leaving unclosed-session warnings.
 
 ## Script verification log
 

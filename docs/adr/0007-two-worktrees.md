@@ -6,7 +6,9 @@
   under the running process.
 - **Decision**:
   - `scripts/setup-demo.ps1` creates two worktrees and a data directory as siblings of the repo:
-    - `aps-live` is detached at `demo/07-complete` and runs on ports 8765 and 5175.
+    - `aps-live` is detached at `main` and runs on ports 8765 and 5175. That is `demo/07-complete`
+      plus fixes found during live verification; the tag itself stays the historical checkpoint.
+      Re-running `setup-demo.ps1` moves it forward.
     - `aps-walkthrough` is moved between the `demo/NN-*` tags by `show-checkpoint.ps1`.
     - `aps-data` holds SQLite, the cache and `.env` (passed as `APS_ENV_FILE`).
   - Checkpoint switching stashes uncommitted changes, after asking for confirmation, before it

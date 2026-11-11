@@ -33,8 +33,10 @@ Write-Step "Worktrees and data"
 $appDir = if (Test-Path $LiveDir) { $LiveDir } else { Write-Warn2 "aps-live missing; using $RepoRoot"; $RepoRoot }
 if (Test-Path $WalkDir) { Write-Ok "walkthrough at $(git -C $WalkDir describe --tags --always)" } else { Write-Warn2 "aps-walkthrough missing (run setup-demo.ps1)"; $failed++ }
 if (Test-Path $LiveDir) {
-    $liveAt = git -C $LiveDir describe --tags --exact-match 2>$null
-    if ($liveAt -eq $FinalTag) { Write-Ok "live worktree at $FinalTag" } else { Write-Warn2 "live worktree is at '$(git -C $LiveDir describe --tags --always)', expected $FinalTag" }
+    $liveHead = git -C $LiveDir rev-parse HEAD
+    $mainHead = git -C $RepoRoot rev-parse $LiveBranch
+    if ($liveHead -eq $mainHead) { Write-Ok "live worktree at $LiveBranch ($(git -C $LiveDir describe --tags --always))" }
+    else { Write-Warn2 "live worktree is not at $LiveBranch - run .\scripts\setup-demo.ps1 to update it (stop the app first)"; $failed++ }
 }
 if (Test-Path $EnvFile) { Write-Ok "config: $EnvFile" } else { Write-Warn2 "missing $EnvFile"; $failed++ }
 

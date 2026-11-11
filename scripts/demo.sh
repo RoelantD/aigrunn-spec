@@ -16,8 +16,7 @@ step() { printf '\033[36m==> %s\033[0m\n' "$*"; }
 cmd_setup() {
   mkdir -p "$DATA"; [ -f "$ENVF" ] || { cp "$REPO_ROOT/.env.example" "$ENVF"; echo "Created $ENVF - fill it in."; }
   cd "$REPO_ROOT"
-  local ref; ref=$(git tag --list "$FINAL" | grep -q . && echo "$FINAL" || echo HEAD)
-  [ -d "$LIVE" ] || git worktree add --detach "$LIVE" "$ref"
+  if [ -d "$LIVE" ]; then git -C "$LIVE" checkout --quiet --detach main; else git worktree add --detach "$LIVE" main; fi
   [ -d "$WALK" ] || git worktree add --detach "$WALK" "$(git tag --list demo/00-initial | grep -q . && echo demo/00-initial || echo HEAD)"
   (cd "$LIVE/backend" && uv sync --quiet); (cd "$LIVE/frontend" && npm ci --no-fund --no-audit --loglevel=error)
   step "Ready: $LIVE (live), $WALK (walkthrough), $DATA (data)"

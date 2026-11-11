@@ -34,10 +34,16 @@ class Services:
     async def aclose(self) -> None:
         await self.runs.shutdown()
         await self.aoc.aclose()
+        token_fns = {id(t): t for t in [getattr(p, "_token_fn", None) for p in self.router.providers.values()]
+                     + [getattr(self.executor, "_token_fn", None)] if t is not None}
         await self.router.aclose()
         close = getattr(self.executor, "aclose", None)
         if close:
             await close()
+        for t in token_fns.values():  # closes the aiohttp sessions behind azure.identity.aio credentials
+            closer = getattr(t, "close", None)
+            if closer:
+                await closer()
         await self.db.dispose()
 
 
