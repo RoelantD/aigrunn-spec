@@ -61,7 +61,8 @@ def verify_examples(
         if key in seen:
             continue
         seen.add(key)
-        accepted.append(VerifiedExample(input=_norm(raw_in) + "\n", expected=exp if reliable else None,
+        verbatim = raw_in.replace("\r\n", "\n").strip("\n") + "\n"  # keep in-line whitespace exactly (FR-009)
+        accepted.append(VerifiedExample(input=verbatim, expected=exp if reliable else None,
                                         reliable=reliable, note=str(ex.get("note") or "")))
         if len(accepted) >= max_examples:
             break

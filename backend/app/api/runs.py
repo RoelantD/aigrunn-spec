@@ -23,6 +23,7 @@ from app.persistence.tables import (
     RunStatus,
     Submission,
     SubmissionOutcome,
+    iso_utc,
 )
 from app.services import Services
 
@@ -80,9 +81,9 @@ def run_dict(r: Run, active: bool = False) -> dict:
         "id": r.id, "mode": r.mode, "source_run_id": r.source_run_id, "year": r.year, "day_from": r.day_from,
         "day_to": r.day_to, "status": r.status, "stop_reason": r.stop_reason, "auto_submit": r.auto_submit,
         "config": r.config, "current_day": r.current_day, "current_part": r.current_part,
-        "created_at": r.created_at.isoformat() if r.created_at else None,
-        "started_at": r.started_at.isoformat() if r.started_at else None,
-        "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+        "created_at": iso_utc(r.created_at),
+        "started_at": iso_utc(r.started_at),
+        "finished_at": iso_utc(r.finished_at),
         "elapsed_seconds": r.elapsed_seconds, "total_cost_usd": r.total_cost_usd,
         "total_input_tokens": r.total_input_tokens, "total_output_tokens": r.total_output_tokens,
         "total_reasoning_tokens": r.total_reasoning_tokens, "total_model_calls": r.total_model_calls,
@@ -248,8 +249,8 @@ async def part_detail(run_id: int, day: int, part: int, svc: Services = Depends(
 def _sub_dict(s: Submission) -> dict:
     return {"id": s.id, "year": s.year, "day": s.day, "part": s.part, "answer": s.answer, "outcome": s.outcome,
             "message": s.message, "wait_seconds": s.wait_seconds,
-            "submitted_at": s.submitted_at.isoformat() if s.submitted_at else None,
-            "responded_at": s.responded_at.isoformat() if s.responded_at else None}
+            "submitted_at": iso_utc(s.submitted_at),
+            "responded_at": iso_utc(s.responded_at)}
 
 
 @router.get("/runs/{run_id}/parts/{day}/{part}/revisions")
@@ -270,7 +271,7 @@ async def revisions(run_id: int, day: int, part: int, svc: Services = Depends(se
             continue
         out.append({
             "revision": rev.revision, "model_key": rev.model_key, "code": rev.code, "sha256": rev.sha256,
-            "created_at": rev.created_at.isoformat() if rev.created_at else None,
+            "created_at": iso_utc(rev.created_at),
             "results": [{"kind": r.kind, "status": r.status, "cases": r.cases, "answer": r.answer,
                          "stdout": r.stdout[-4000:], "stderr": r.stderr[-4000:], "duration_ms": r.duration_ms,
                          "timed_out": r.timed_out, "correlation_id": r.correlation_id} for r in results],
@@ -293,7 +294,7 @@ async def metrics(run_id: int, svc: Services = Depends(services)) -> dict:
     by_model: dict[str, dict] = defaultdict(lambda: {"calls": 0, "input_tokens": 0, "output_tokens": 0,
                                                      "reasoning_tokens": 0, "latency_ms_total": 0, "cost_usd": 0.0,
                                                      "errors": 0})
-    by_part: dict[str, dict] = defaultdict(lambda: {"calls": 0, "cost_usd": 0.0, "tokens": 0})
+    by_part: dict[str, dict] = defaultdict(lambda: {"calls": 0, "cost_usd": 0.0, "tokens": 0, "latency_ms_total": 0})
     parts = {p.id: p for p in await svc.store.parts_for_run(rid)}
     for i in invs:
         m = by_model[i.model_key]
@@ -310,6 +311,7 @@ async def metrics(run_id: int, svc: Services = Depends(services)) -> dict:
             by_part[k]["calls"] += 1
             by_part[k]["cost_usd"] = round(by_part[k]["cost_usd"] + i.cost_usd, 6)
             by_part[k]["tokens"] += i.input_tokens + i.output_tokens
+            by_part[k]["latency_ms_total"] += i.latency_ms
     for m in by_model.values():
         m["avg_latency_ms"] = int(m["latency_ms_total"] / m["calls"]) if m["calls"] else 0
     names = {k: svc.router.display_name(k) for k in by_model}

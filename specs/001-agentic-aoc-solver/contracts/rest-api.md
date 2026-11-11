@@ -21,7 +21,7 @@ contract; this document fixes the endpoint surface.
 | GET | `/runs/{id}/submissions` | submission history | FR-017 |
 | GET | `/runs/{id}/metrics` | tokens, calls, latency, cost per model and per part, escalations | FR-037 |
 | GET | `/runs/{id}/events?after_id=` | paginated event history | FR-031 |
-| GET | `/runs/{id}/events/stream` | SSE; honors `Last-Event-ID` header or `?after_id=`; event `id` = Event.id, `event` = type, `data` = Event JSON; keep-alive comment every 15 s | FR-031 |
+| GET | `/runs/{id}/events/stream` | SSE; honors `Last-Event-ID` header or `?after_id=`; event `id` = Event.id, `event` = `message`, `data` = Event JSON (type in `data.type`); keep-alive every 15 s | FR-031 |
 | POST | `/runs/{id}/replay` | `{speed: number (1–100)}` → creates replay run (mode=replay) and starts streaming recorded events; no external calls | FR-039 |
 | DELETE | `/runs/{id}` | delete local run data; response includes `notice: "Advent of Code account progress is not affected"` | FR-028 |
 | POST | `/local-data/reset` | reset all local runs (cache kept unless `include_cache`); same notice | FR-028 |

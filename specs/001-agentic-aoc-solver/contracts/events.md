@@ -31,5 +31,10 @@ contains secrets, cookies, tokens, or personal puzzle input.
 | `budget.warning` | warning | `{spent_usd, limit_usd}` | 80% of budget |
 | `error` | error | `{kind: infra\|aoc\|internal, detail}` | unexpected failures (redacted) |
 
-Ordering: `id` is a global monotonically increasing integer; clients resume with `Last-Event-ID`.
+Ordering: `id` is a global monotonically increasing integer; clients resume with `Last-Event-ID`
+(or `?after_id=`).
+
+SSE framing: every event is sent with SSE field `id` = Event.id, SSE `event` = `message` (so a plain
+`EventSource.onmessage` handler receives all events) and `data` = the JSON object above; the event
+type is carried in `data.type`. Timestamps are ISO-8601 with an explicit UTC offset.
 Replayed events carry `replay: true` and belong to the replay run.

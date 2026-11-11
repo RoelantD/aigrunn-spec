@@ -68,6 +68,7 @@ class PartWork:
     previous_code: str | None = None
     last_failure: str | None = None
     after_rejection: bool = False
+    extended_input_timeout: bool = False  # set after a real-input timeout (FR-004 configurable maximum)
 
 
 def _short(s: str | None, n: int = 160) -> str:
@@ -162,9 +163,10 @@ class Solver:
         return resp
 
     # ------------------------------------------------------------------ execution
-    async def _execute(self, w: PartWork, code: str, cases: list[str], session_id: str) -> ExecutionOutcome:
+    async def _execute(self, w: PartWork, code: str, cases: list[str], session_id: str,
+                       timeout_s: int | None = None) -> ExecutionOutcome:
         try:
-            return await self.executor.run_cases(code, cases, self.cfg.exec_timeout_s, session_id)
+            return await self.executor.run_cases(code, cases, timeout_s or self.cfg.exec_timeout_s, session_id)
         except ExecutionInfraError as exc:
             raise PauseRun(f"sandbox unavailable: {exc}") from exc
 
@@ -355,8 +357,11 @@ class Solver:
             # ---- real input
             self.control.checkpoint()
             await self.set_state(pp, w, PartState.EXECUTING_INPUT)
-            await self.emit(w, "exec.started", "Executing actual input", revision=rev_no)
-            out = await self._execute(w, code, [w.input_text], session_id)
+            input_timeout = self.cfg.exec_timeout_max_s if w.extended_input_timeout else self.cfg.exec_timeout_s
+            await self.emit(w, "exec.started", "Executing actual input"
+                            + (f" (extended timeout {input_timeout}s)" if w.extended_input_timeout else ""),
+                            revision=rev_no, timeout_s=input_timeout)
+            out = await self._execute(w, code, [w.input_text], session_id, input_timeout)
             r = out.results[0] if out.results else None
             answer = normalize_answer(r.output) if (r and r.error is None and r.output is not None) else ""
             err = (r.error if r else None) or out.load_error or (out.stderr[-1500:] if not r else None)
@@ -369,7 +374,8 @@ class Solver:
             if out.timed_out or not answer:
                 if out.timed_out:
                     w.last_failure = "timeout"
-                    msg = (f"Real input timed out after {self.cfg.exec_timeout_s}s — the algorithm is too slow "
+                    w.extended_input_timeout = True
+                    msg = (f"Real input timed out after {input_timeout}s — the algorithm is too slow "
                            f"for the full input")
                 else:
                     w.last_failure = "error"

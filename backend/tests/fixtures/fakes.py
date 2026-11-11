@@ -84,6 +84,12 @@ class FakeExecutor:
         if beh is None:
             return ExecutionOutcome(status="error", load_error="solve(input_text) is not defined",
                                     correlation_id=session_id)
+        if isinstance(beh, tuple):  # ("needs", seconds, fn): times out unless the timeout is large enough
+            _, need, fn = beh
+            if len(cases) == 1 and len(cases[0]) > 30 and timeout_s < need:
+                return ExecutionOutcome(status="timeout", timed_out=True, stderr="execution timed out",
+                                        correlation_id=session_id, duration_ms=timeout_s * 1000)
+            beh = fn
         if beh == "timeout":
             return ExecutionOutcome(status="timeout", timed_out=True, stderr="execution timed out",
                                     correlation_id=session_id, duration_ms=timeout_s * 1000)
