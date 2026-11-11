@@ -47,6 +47,20 @@ This creates the following:
 
 Authentication uses Entra ID, through your `az login`. No API keys are needed.
 
+**Reusing an existing resource group and Foundry account** that already has both deployments: only
+the session pool and the role assignments are created.
+
+```powershell
+azd env new aps-demo
+azd env set AZURE_LOCATION swedencentral          # region for the session pool and the deployment record
+azd env set APS_RESOURCE_GROUP rg-aigrunn         # existing resource group
+azd env set APS_EXISTING_FOUNDRY aif-grunn        # existing AIServices account (gpt-6.1-sol, claude-opus-5-5)
+azd provision
+```
+
+`AZURE_LOCATION` must be set. A subscription-scope deployment fails with *"The 'location' property
+must be specified"* if it is missing.
+
 Optional pieces:
 
 - If the Claude deployment fails because of subscription eligibility, run
