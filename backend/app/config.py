@@ -99,6 +99,12 @@ class Settings(BaseSettings):
     # Defaults for new runs
     default_max_spend_usd: float = 20.0
 
+    @field_validator("aps_data_dir")
+    @classmethod
+    def _resolve_data_dir(cls, v: Path) -> Path:
+        # Relative paths are relative to the repository root (not the process cwd).
+        return v if v.is_absolute() else (REPO_ROOT / v).resolve()
+
     @field_validator("foundry_openai_base_url", "foundry_anthropic_base_url", "sessions_pool_endpoint")
     @classmethod
     def _validate_urls(cls, v: str | None) -> str | None:

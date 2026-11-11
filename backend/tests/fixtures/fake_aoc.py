@@ -61,8 +61,8 @@ class FakeAoc:
                             "stars: **</p>")
             else:
                 if day == 25:
-                    body.append(f'<form method="post" action="25/answer"><input type="hidden" name="level" value="2"/>'
-                                f'<input type="hidden" name="answer" value="0"/></form>')
+                    body.append('<form method="post" action="25/answer"><input type="hidden" name="level" value="2"/>'
+                                '<input type="hidden" name="answer" value="0"/></form>')
                 else:
                     body.append(f'<form method="post" action="{day}/answer"><input type="hidden" name="level" '
                                 f'value="2"/><input type="text" name="answer"/></form>')
@@ -124,7 +124,7 @@ class FakeAoc:
         if answer.strip() == expected:
             done.add(level)
             text = ("That's the right answer! You are <span class=\"day-success\">one gold star</span> closer. "
-                    f"[Continue to Part Two]")
+                    "[Continue to Part Two]")
             resp = httpx.Response(200, text=self.answer_html(text))
             if self.drop_next_post_after_processing:
                 self.drop_next_post_after_processing = False
