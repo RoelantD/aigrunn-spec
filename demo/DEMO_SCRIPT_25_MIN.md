@@ -1,5 +1,9 @@
 # 25-minute demo script
 
+> The full talk, with slides, code stops and demo, is in [TALK_SCRIPT.md](TALK_SCRIPT.md). The deck
+> is built from [CLAUDE_DESIGN_PROMPT.md](CLAUDE_DESIGN_PROMPT.md). This file covers the demo and
+> checkpoint cues only.
+
 Before going on stage, finish [PREFLIGHT_CHECKLIST.md](PREFLIGHT_CHECKLIST.md). Have these windows
 ready:
 

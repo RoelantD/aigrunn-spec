@@ -1,7 +1,8 @@
 # Presenter Guide
 
-This guide covers preparing and running the 25-minute Spec-Driven Development talk. The minute-by-minute
-script is in [DEMO_SCRIPT_25_MIN.md](DEMO_SCRIPT_25_MIN.md).
+This guide covers preparing and running the 25-minute Spec-Driven Development talk. The full talk script
+(slides + code + demo) is [TALK_SCRIPT.md](TALK_SCRIPT.md); slides come from
+[CLAUDE_DESIGN_PROMPT.md](CLAUDE_DESIGN_PROMPT.md).
 
 **The model:** the finished app runs from worktree **A** (`aps-live`) and keeps solving real puzzles.
 Meanwhile you walk through the Spec Kit history in worktree **B** (`aps-walkthrough`). The two never
