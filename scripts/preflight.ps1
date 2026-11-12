@@ -31,7 +31,9 @@ if (Test-Tool 'az') {
 
 Write-Step "Worktrees and data"
 $appDir = if (Test-Path $LiveDir) { $LiveDir } else { Write-Warn2 "aps-live missing; using $RepoRoot"; $RepoRoot }
-if (Test-Path $WalkDir) { Write-Ok "walkthrough at $(git -C $WalkDir describe --tags --always)" } else { Write-Warn2 "aps-walkthrough missing (run setup-demo.ps1)"; $failed++ }
+if (Test-Path $WalkDir) { Write-Ok "walkthrough on $(git -C $WalkDir branch --show-current)" } else { Write-Warn2 "aps-walkthrough missing (run setup-demo.ps1)"; $failed++ }
+$missingSteps = @($Steps | Where-Object { -not (git -C $RepoRoot branch --list $_) })
+if ($missingSteps.Count) { Write-Warn2 "missing step branches: $($missingSteps -join ', ') (python scripts\walkthroughuild_walkthrough.py)"; $failed++ } else { Write-Ok "all $($Steps.Count) step branches present (00-start .. 10-working)" }
 if (Test-Path $LiveDir) {
     $liveHead = git -C $LiveDir rev-parse HEAD
     $mainHead = git -C $RepoRoot rev-parse $LiveBranch

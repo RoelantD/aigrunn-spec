@@ -143,19 +143,22 @@ This opens a backend window (:8765) and a dashboard window (:5175).
 The run continues until the range is done, you pause or stop it, the budget runs out, or a cooldown
 or service problem pauses it.
 
-## 9. Switch Spec Kit checkpoints (worktree B)
+## 9. Step through the walkthrough branches (worktree B)
 
 ```powershell
 .\scripts\show-checkpoint.ps1 -List
-.\scripts\show-checkpoint.ps1 constitution     # specify, clarify, plan, tasks, implement, complete
+.\scripts\show-checkpoint.ps1 00-start         # title page; then -Next, or a name: 02-constitution, clarify, 7, …
 code ..\aps-walkthrough                          # open once; VS Code follows the checkout
-.\scripts\return-to-complete.ps1
+.\scripts\return-to-complete.ps1                 # back to 10-working
 ```
+
+Each step has a `NEXT_STEP.md` with the prompt for the next step. Paste it into Copilot Chat without
+sending it, then switch.
 
 - The script refuses to discard uncommitted changes in B until you type `discard`, and even then it
   stashes them first.
 - It never touches A or `aps-data`.
-- [CHECKPOINTS.md](CHECKPOINTS.md) lists what to show at each checkpoint.
+- [CHECKPOINTS.md](CHECKPOINTS.md) lists every step, its source and what to show.
 
 ## 10. Inspect artifacts with GitHub Copilot
 

@@ -46,12 +46,13 @@ try {
         Write-Ok "created"
     }
 
-    Write-Step "Worktree B (walkthrough) -> $WalkDir @ demo/00-initial"
+    Write-Step "Worktree B (walkthrough) -> $WalkDir @ 00-start"
     if (Test-Path $WalkDir) {
         Write-Ok "exists; current HEAD: $(git -C $WalkDir describe --tags --always)"
     } else {
-        $start = if (git tag --list 'demo/00-initial') { 'demo/00-initial' } else { 'HEAD' }
-        git worktree add --quiet --detach $WalkDir $start
+        $hasSteps = git branch --list '00-start'
+        if ($hasSteps) { git worktree add --quiet $WalkDir '00-start' }
+        else { git worktree add --quiet --detach $WalkDir 'HEAD'; Write-Warn2 "step branches missing: python scripts\walkthroughuild_walkthrough.py" }
         Write-Ok "created"
     }
 } finally { Pop-Location }

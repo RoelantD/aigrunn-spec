@@ -43,7 +43,7 @@ Three takeaways:
 
 - **Three virtual desktops**, switched with Ctrl+Win+←/→: (1) Slides, (2) VS Code on
   `..\aps-walkthrough` with Copilot Chat plus a terminal in the dev clone, (3) Browser on `/present`.
-- **Before the talk**, `show-checkpoint.ps1 initial` and `start-live-app.ps1`. Have a run
+- **Before the talk**, `show-checkpoint.ps1 00-start` and `start-live-app.ps1`. Have a run
   *configured* but not started. Keep `aps-data\.env` closed.
 
 ---
@@ -119,6 +119,9 @@ Three supporting points:
 
 ### 4:50 [S7] The Spec Kit flow
 
+*(Optional, 30 s: switch to VS Code on `00-start` and show the ASCII title page, an empty repo with only
+an intent. Then `-Next` to `01-install` and its `NEXT_STEP.md`, which holds the constitution prompt.)*
+
 The slide is the pipeline, with each stage marked by its git tag:
 `constitution → specify → clarify → plan → checklist → tasks → analyze → implement → converge`
 
@@ -133,8 +136,15 @@ The slide is the pipeline, with each stage marked by its git tag:
 
 ## Act 3 · The concepts, one artifact at a time (6:00 – 17:00)
 
-Pattern for each step: **[S] concept slide (≈ 40 s) → [C] the real artifact (≈ 60 s)**. Switch the
-walkthrough with `.\scripts\show-checkpoint.ps1 <name>`. The solver keeps running.
+Pattern for each step: **[S] concept slide (≈ 40 s) → [C] the real artifact (≈ 60 s)**.
+
+How each [C] stop works, cooking-show style:
+
+1. You are on the previous step branch. Open `NEXT_STEP.md` and paste its prompt into Copilot Chat,
+   **without sending it**.
+2. Run `.\scripts\show-checkpoint.ps1 <next-step>` and say: *"this is what that prompt produced."*
+
+Nothing is generated live. See [CHECKPOINTS.md](CHECKPOINTS.md). The solver keeps running.
 
 ### 6:00 [S8] Constitution = the rules every later step must obey
 
@@ -144,7 +154,7 @@ walkthrough with `.\scripts\show-checkpoint.ps1 <name>`. The solver keeps runnin
   - *"A star appears only after the server confirms."*
   - *"Model-generated code never runs on this laptop."*
 
-### 6:40 [C] `show-checkpoint.ps1 constitution` → `.specify/memory/constitution.md`
+### 6:40 [C] `show-checkpoint.ps1 02-constitution` → `.specify/memory/constitution.md`
 
 Highlight Principle I, then ask Copilot Chat:
 `#file:.specify/memory/constitution.md Which principle would stop the dashboard from showing fake progress?`
@@ -159,7 +169,7 @@ Highlight Principle I, then ask Copilot Chat:
 - **In our project:** 7 user stories, 48 requirements, 10 success criteria.
 - The key move is **defining done**: *tests passed ≠ answer computed ≠ accepted by Advent of Code*.
 
-### 8:20 [C] `show-checkpoint.ps1 specify` → `spec.md`
+### 8:20 [C] `show-checkpoint.ps1 03-specify` → `spec.md`
 
 Show User Story 1 with its Given/When/Then scenarios. Then ask Copilot:
 `#file:specs/001-agentic-aoc-solver/spec.md which requirement prevents submitting the same wrong answer twice?`
@@ -176,7 +186,7 @@ It should land on FR-019.
 
 > "Each of these would have been a bug in production. Here, each one is a single line of text."
 
-### 9:50 [C] `show-checkpoint.ps1 clarify` → `## Clarifications`
+### 9:50 [C] `show-checkpoint.ps1 04-clarify` → `## Clarifications`
 
 Point at the provenance note: *the agent answered these itself, and says so*.
 
@@ -192,7 +202,7 @@ Point at the provenance note: *the agent answered these itself, and says so*.
   - contracts define the website client's behaviour: *HTTP 200 ≠ accepted*
   - a Constitution Check table acts as a gate
 
-### 11:10 [C] `show-checkpoint.ps1 plan` → `research.md` (R7/R8), then `contracts/aoc-client.md`
+### 11:10 [C] `show-checkpoint.ps1 05-plan` → `research.md` (R7/R8), then `contracts/aoc-client.md`
 
 > "Research is context engineering at work. The model isn't guessing APIs. It reads what was
 > verified and written down."
@@ -206,7 +216,7 @@ Point at the provenance note: *the agent answered these itself, and says so*.
   - there was no guard against hard-coded answers
 - Both were fixed with two text edits.
 
-### 12:30 [C] `show-checkpoint.ps1 tasks` → `analysis.md`
+### 12:30 [C] `show-checkpoint.ps1 07-analyze` → `analysis.md`
 
 Show the findings table and the coverage table, which maps each requirement to its tasks.
 
@@ -219,7 +229,7 @@ Show the findings table and the coverage table, which maps each requirement to i
 - **In our project:** converge needed three passes. Pass 1 found 7 gaps (one contradicted a
   contract), pass 2 found 2, and pass 3 came back clean.
 
-### 13:50 [C] `show-checkpoint.ps1 complete` → `tasks.md` Phase 11–12, then `traceability.md`
+### 13:50 [C] `show-checkpoint.ps1 09-converge` → `tasks.md` Phase 11–12, then `traceability.md`
 
 Pick one row: **FR-021** (reconcile before resubmitting) → `orchestrator.reconcile` → its test.
 
