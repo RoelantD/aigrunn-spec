@@ -1,24 +1,55 @@
-# Development checkpoints
+# Walkthrough steps (branches) and checkpoints (tags)
 
-Each tag points at the genuine commit created when that Spec Kit stage finished. They are listed in
-order with `git log --oneline --decorate`. Switch worktree B with `scripts\show-checkpoint.ps1 <name>`.
+On stage you step through **branches** `00-start` … `10-working` in worktree B (`aps-walkthrough`).
+Each branch holds **exactly the content of a real development stage**, plus a `NEXT_STEP.md` with the
+prompt that leads to the next branch. This works like a cooking show: you show the prompt (paste it
+into Copilot Chat, but don't send it), then switch to the branch that holds the recorded result.
+Nothing is generated live, so the talk is predictable.
 
-| Name | Tag | Spec Kit step | Open these | Talking point |
-|------|-----|---------------|------------|---------------|
-| initial | `demo/00-initial` | `specify init --integration claude --script ps` | `.specify/`, `.claude/skills/speckit-*` | Spec Kit 1.4.0 adds templates, scripts and agent skills. There is no code yet. |
-| constitution | `demo/01-constitution` | `/speckit-constitution` | `.specify/memory/constitution.md` | Seven non-negotiables, such as "stars only on server-confirmed acceptance" and "generated code never runs on the host". They govern everything after this point. |
-| specify | `demo/02-specify` | `/speckit-specify` | `specs/001-agentic-aoc-solver/spec.md`, `checklists/requirements.md` | Seven user stories, 48 FRs and success criteria, with no technology named. The agent took the tech stack out of the brief on purpose. |
-| clarify | `demo/03-clarify` | `/speckit-clarify` | `spec.md` → `## Clarifications` | Five decisions: request pacing, failure progression, the submission cap, cooldown behaviour and Day 25. The provenance note says these were the agent's own decisions; no stakeholder meeting was invented. |
-| plan | `demo/04-plan` | `/speckit-plan` | `plan.md`, `research.md`, `data-model.md`, `contracts/*` | The technical plan: Foundry Responses vs Claude Messages, the Dynamic Sessions harness, the state machine and the Constitution Check gate. |
-| tasks | `demo/05-tasks` | `/speckit-checklist`, `/speckit-tasks`, `/speckit-analyze` | `tasks.md`, `checklists/submission-safety.md`, `analysis.md` | 83 tasks grouped by user story. Analyze found 2 HIGH issues (an infra outage would have cascaded BLOCKED; there was no guard against hard-coded answers), and both were fixed before any code existed. |
-| implement | `demo/06-implement` | `/speckit-implement` | `backend/app/agents/orchestrator.py`, `frontend/src/pages/Presentation.tsx`, `tasks.md` `[X]` | The working app, with 75 backend tests and 5 frontend tests at this point. The checklist gate showed 0/26 reviewer items checked; the commit message records that implementation went ahead anyway. |
-| complete | `demo/07-complete` | `/speckit-converge` ⇄ `/speckit-implement` (3 passes) | `tasks.md` Phases 11–12, `traceability.md`, `docs/adr/`, `demo/`, `.github/skills/` | Converge pass 1 added 7 tasks (one contradicts: SSE contract) and pass 2 added 2 more (presentation font size, event list). All were implemented, and pass 3 came back clean with tasks.md unchanged. The Copilot integration was added here. |
+```powershell
+git switch 02-constitution        # in aps-walkthrough, or use the VS Code branch picker
+```
 
-Commits without a tag, between checkpoints, are intermediate steps of the same stage (for example the
-checklist and tasks commits before `demo/05-tasks`). They show the history is genuine and was not
-squashed.
+`.\scripts\show-checkpoint.ps1` does the same with a few extras: `-List`, `-Next`, stashing local
+edits, and writing `.specify/feature.json`. Plain `git switch` is all you need on stage.
+
+| Step branch | Content = real stage | Prompt in its `NEXT_STEP.md` (leads to the next step) | Show on stage |
+|-------------|----------------------|------------------------------------------------------|---------------|
+| `00-start` | new root: title page only | `specify init` (install Spec Kit) | `README.md`, the ASCII title |
+| `01-install` | tag `demo/00-initial` | `/speckit-constitution …` | `.specify/`, `.github/skills/speckit-*` |
+| `02-constitution` | tag `demo/01-constitution` | `/speckit-specify …` | `.specify/memory/constitution.md` |
+| `03-specify` | tag `demo/02-specify` | `/speckit-clarify` | `spec.md` (user stories, FR-019) |
+| `04-clarify` | tag `demo/03-clarify` | `/speckit-plan …` (tech stack) | `spec.md` → `## Clarifications` |
+| `05-plan` | tag `demo/04-plan` | `/speckit-checklist …` then `/speckit-tasks` | `plan.md`, `research.md`, `contracts/aoc-client.md` |
+| `06-tasks` | commit `66357b8` | `/speckit-analyze`, then apply remediation | `tasks.md`, `checklists/submission-safety.md` |
+| `07-analyze` | tag `demo/05-tasks` | `/speckit-implement` | `analysis.md` (2 HIGH findings) |
+| `08-implement` | tag `demo/06-implement` | `/speckit-converge` ⇄ `/speckit-implement` | `orchestrator.py` `_submit()` |
+| `09-converge` | tag `demo/07-complete` | live verification (`azd provision`, preflight, live tests) | `tasks.md` Phases 11–12, `traceability.md` |
+| `10-working` | `main` when the branches were built | run it: preflight + `start-live-app.ps1` | `docs/TESTING.md` |
+
+## What differs from the original history
+
+- **The tags `demo/00` … `demo/07` are the original, untouched commits.** They are the provenance.
+  The step branches are a separate linear chain whose *trees* reproduce those stages.
+- **`00-start` is new.** The original repo started directly with `specify init`.
+- **Copilot skills are present from `01-install` onwards.** That way `/speckit-…` autocompletes in
+  Copilot Chat at every step. In the original run, the Copilot integration was installed during
+  convergence.
+- **The prompts in `NEXT_STEP.md` are the commands to type.** The stages were produced in Claude Code.
+  The `/speckit-specify` text is the recorded feature input, and the other prompts restate what was
+  asked. A model won't reproduce the output byte for byte, which is why each next branch holds the
+  recorded result.
+
+## Rebuilding the branches
+
+The branches are generated, so rebuild them after `main` changes. This updates `10-working`:
+
+```powershell
+git -C ..\aps-walkthrough checkout --detach     # free the branch the walkthrough is on
+python scripts\walkthrough\build_walkthrough.py
+.\scripts\show-checkpoint.ps1 00-start -Force
+```
 
 Spec Kit tracks the active feature in `.specify/feature.json`, separately from the branch. That file
-is git-ignored per checkout, so `show-checkpoint.ps1` writes
-`{"feature_directory": "specs/001-agentic-aoc-solver"}` whenever the checkpoint contains the spec, and
-removes the file at `initial` and `constitution`.
+is git-ignored, so `show-checkpoint.ps1` writes
+`{"feature_directory": "specs/001-agentic-aoc-solver"}` whenever the step contains the spec.

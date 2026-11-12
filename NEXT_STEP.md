@@ -1,16 +1,10 @@
-# You are here: 09 · converge
+# You are here: 10 · working
 
-The spec and the code agree. Every requirement traces to code and to a test.
+The solver runs live against the real models, the real sandbox and the real website.
 
-## Next → 10-working
-
-```powershell
-azd provision
-cd backend
-uv run python cli.py preflight --days 1-5
-uv run pytest -m live_azure tests/live
-```
+## Run it
 
 ```powershell
-git switch 10-working
+cd backend; uv run uvicorn app.main:get_app --factory --port 8765
+cd frontend; npm run dev
 ```

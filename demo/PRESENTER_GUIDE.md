@@ -1,7 +1,8 @@
 # Presenter Guide
 
-This guide covers preparing and running the 25-minute Spec-Driven Development talk. The minute-by-minute
-script is in [DEMO_SCRIPT_25_MIN.md](DEMO_SCRIPT_25_MIN.md).
+This guide covers preparing and running the 25-minute Spec-Driven Development talk. The full talk script
+(slides + code + demo) is [TALK_SCRIPT.md](TALK_SCRIPT.md); slides come from
+[CLAUDE_DESIGN_PROMPT.md](CLAUDE_DESIGN_PROMPT.md).
 
 **The model:** the finished app runs from worktree **A** (`aps-live`) and keeps solving real puzzles.
 Meanwhile you walk through the Spec Kit history in worktree **B** (`aps-walkthrough`). The two never
@@ -9,8 +10,8 @@ interfere. Run data lives in `aps-data`, outside both worktrees.
 
 ```text
 <parent>\agentic-puzzle-solver   development clone (main)
-<parent>\aps-live                A: demo/07-complete  -> backend :8765, dashboard :5175
-<parent>\aps-walkthrough         B: demo/00 … demo/07 -> open in VS Code + GitHub Copilot
+<parent>\aps-live                A: main (= demo/07-complete + fixes from live verification) -> :8765, :5175
+<parent>\aps-walkthrough         B: branches 00-start … 10-working -> VS Code + GitHub Copilot
 <parent>\aps-data                .env (secrets), solver.db, cache\ (puzzle text + inputs)
 ```
 
@@ -46,6 +47,20 @@ This creates the following:
   *Azure ContainerApps Session Executor*.
 
 Authentication uses Entra ID, through your `az login`. No API keys are needed.
+
+**Reusing an existing resource group and Foundry account** that already has both deployments: only
+the session pool and the role assignments are created.
+
+```powershell
+azd env new aps-demo
+azd env set AZURE_LOCATION swedencentral          # region for the session pool and the deployment record
+azd env set APS_RESOURCE_GROUP rg-aigrunn         # existing resource group
+azd env set APS_EXISTING_FOUNDRY aif-grunn        # existing AIServices account (gpt-6.1-sol, claude-opus-5-5)
+azd provision
+```
+
+`AZURE_LOCATION` must be set. A subscription-scope deployment fails with *"The 'location' property
+must be specified"* if it is missing.
 
 Optional pieces:
 
@@ -128,19 +143,22 @@ This opens a backend window (:8765) and a dashboard window (:5175).
 The run continues until the range is done, you pause or stop it, the budget runs out, or a cooldown
 or service problem pauses it.
 
-## 9. Switch Spec Kit checkpoints (worktree B)
+## 9. Step through the walkthrough branches (worktree B)
 
 ```powershell
 .\scripts\show-checkpoint.ps1 -List
-.\scripts\show-checkpoint.ps1 constitution     # specify, clarify, plan, tasks, implement, complete
+.\scripts\show-checkpoint.ps1 00-start         # title page; then -Next, or a name: 02-constitution, clarify, 7, …
 code ..\aps-walkthrough                          # open once; VS Code follows the checkout
-.\scripts\return-to-complete.ps1
+.\scripts\return-to-complete.ps1                 # back to 10-working
 ```
+
+Each step has a `NEXT_STEP.md` with the prompt for the next step. Paste it into Copilot Chat without
+sending it, then switch.
 
 - The script refuses to discard uncommitted changes in B until you type `discard`, and even then it
   stashes them first.
 - It never touches A or `aps-data`.
-- [CHECKPOINTS.md](CHECKPOINTS.md) lists what to show at each checkpoint.
+- [CHECKPOINTS.md](CHECKPOINTS.md) lists every step, its source and what to show.
 
 ## 10. Inspect artifacts with GitHub Copilot
 

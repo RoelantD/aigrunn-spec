@@ -15,6 +15,7 @@ dependencies = [
     "beautifulsoup4>=4.12",
     "structlog>=24.1",
     "sse-starlette>=2.1",
+    "aiohttp>=3.9",
 ]
 
 [dependency-groups]

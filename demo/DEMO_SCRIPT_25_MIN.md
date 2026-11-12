@@ -1,5 +1,10 @@
 # 25-minute demo script
 
+> **Superseded for the conference talk.** The talk is about Spec-Driven Development, with the
+> solver only as its running example. Use [TALK_SCRIPT.md](TALK_SCRIPT.md) and
+> [CLAUDE_DESIGN_PROMPT.md](CLAUDE_DESIGN_PROMPT.md). This file is kept as a demo-centric variant
+> for a longer, hands-on session.
+
 Before going on stage, finish [PREFLIGHT_CHECKLIST.md](PREFLIGHT_CHECKLIST.md). Have these windows
 ready:
 

@@ -4,7 +4,7 @@
 
 .DESCRIPTION
   Creates, next to this repository:
-    aps-live         worktree A (detached at demo/07-complete) - runs the solver
+    aps-live         worktree A (detached at main = demo/07-complete + post-checkpoint fixes) - runs the solver
     aps-walkthrough  worktree B (detached at demo/00-initial)  - checkpoint walkthrough
     aps-data         runtime data (SQLite, puzzle cache, .env) - never inside a worktree
   and installs backend/frontend dependencies in aps-live. Safe to re-run.
@@ -26,7 +26,7 @@ Push-Location $RepoRoot
 try {
     git fetch --tags --quiet 2>$null
     if (-not $LiveRef) {
-        $LiveRef = if (git tag --list $FinalTag) { $FinalTag } else { 'HEAD' }
+        $LiveRef = $LiveBranch
     }
 
     Write-Step "Runtime data directory"
@@ -38,18 +38,21 @@ try {
 
     Write-Step "Worktree A (live app) -> $LiveDir @ $LiveRef"
     if (Test-Path $LiveDir) {
-        Write-Ok "exists; current HEAD: $(git -C $LiveDir describe --tags --always)"
+        $dirtyLive = git -C $LiveDir status --porcelain --untracked-files=no
+        if ($dirtyLive) { Write-Warn2 "aps-live has local changes; not updating it" }
+        else { git -C $LiveDir checkout --quiet --detach $LiveRef; Write-Ok "updated to $LiveRef ($(git -C $LiveDir rev-parse --short HEAD))" }
     } else {
         git worktree add --quiet --detach $LiveDir $LiveRef
         Write-Ok "created"
     }
 
-    Write-Step "Worktree B (walkthrough) -> $WalkDir @ demo/00-initial"
+    Write-Step "Worktree B (walkthrough) -> $WalkDir @ 00-start"
     if (Test-Path $WalkDir) {
         Write-Ok "exists; current HEAD: $(git -C $WalkDir describe --tags --always)"
     } else {
-        $start = if (git tag --list 'demo/00-initial') { 'demo/00-initial' } else { 'HEAD' }
-        git worktree add --quiet --detach $WalkDir $start
+        $hasSteps = git branch --list '00-start'
+        if ($hasSteps) { git worktree add --quiet $WalkDir '00-start' }
+        else { git worktree add --quiet --detach $WalkDir 'HEAD'; Write-Warn2 "step branches missing: python scripts\walkthroughuild_walkthrough.py" }
         Write-Ok "created"
     }
 } finally { Pop-Location }

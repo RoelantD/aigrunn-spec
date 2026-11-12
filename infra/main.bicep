@@ -41,20 +41,31 @@ param claudeIndustry string = 'technology'
 @description('Max concurrent sandbox sessions')
 param maxConcurrentSessions int = 10
 
+@description('Use an existing resource group instead of creating rg-<environmentName>')
+param resourceGroupName string = ''
+
+@description('Name of an existing Foundry (AIServices) account in that resource group that already has the deployments. When set, no account or model deployments are created.')
+param existingFoundryName string = ''
+
 var token = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName, app: 'agentic-puzzle-solver' }
+var createRg = empty(resourceGroupName)
+var rgName = createRg ? 'rg-${environmentName}' : resourceGroupName
+var createFoundry = empty(existingFoundryName)
+var foundryName = createFoundry ? 'aif-aps-${token}' : existingFoundryName
 
-resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
-  name: 'rg-${environmentName}'
+resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = if (createRg) {
+  name: rgName
   location: location
   tags: tags
 }
 
-module foundry 'modules/foundry.bicep' = {
-  scope: rg
+module foundry 'modules/foundry.bicep' = if (createFoundry) {
+  scope: resourceGroup(rgName)
   name: 'foundry'
+  dependsOn: [rg]
   params: {
-    name: 'aif-aps-${token}'
+    name: foundryName
     location: location
     tags: tags
     workhorseDeploymentName: workhorseDeploymentName
@@ -73,8 +84,9 @@ module foundry 'modules/foundry.bicep' = {
 }
 
 module sessions 'modules/sessionpool.bicep' = {
-  scope: rg
+  scope: resourceGroup(rgName)
   name: 'sessions'
+  dependsOn: [rg]
   params: {
     name: 'apspool${take(token, 12)}'
     location: location
@@ -84,20 +96,21 @@ module sessions 'modules/sessionpool.bicep' = {
 }
 
 module roles 'modules/roles.bicep' = {
-  scope: rg
+  scope: resourceGroup(rgName)
   name: 'roles'
+  dependsOn: [foundry]
   params: {
     principalId: principalId
     principalType: principalType
-    foundryName: foundry.outputs.name
+    foundryName: foundryName
     poolName: sessions.outputs.name
   }
 }
 
 // Values for the application's .env (see .env.example)
-output AZURE_RESOURCE_GROUP string = rg.name
-output FOUNDRY_OPENAI_BASE_URL string = '${foundry.outputs.openAiEndpoint}openai/v1'
-output FOUNDRY_ANTHROPIC_BASE_URL string = deployClaude ? '${foundry.outputs.servicesEndpoint}anthropic' : ''
+output AZURE_RESOURCE_GROUP string = rgName
+output FOUNDRY_OPENAI_BASE_URL string = 'https://${foundryName}.openai.azure.com/openai/v1'
+output FOUNDRY_ANTHROPIC_BASE_URL string = (deployClaude || !createFoundry) ? 'https://${foundryName}.services.ai.azure.com/anthropic' : ''
 output WORKHORSE_DEPLOYMENT string = workhorseDeploymentName
 output ESCALATION_DEPLOYMENT string = escalationDeploymentName
 output SESSIONS_POOL_ENDPOINT string = sessions.outputs.poolManagementEndpoint

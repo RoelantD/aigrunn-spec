@@ -5,7 +5,7 @@ None of the steps below submit an answer or request a locked Part 2.
 ## The day before
 
 - [ ] `git -C <parent>\agentic-puzzle-solver tag --list "demo/*"` shows all 8 tags.
-- [ ] `.\scripts\setup-demo.ps1` has run. `aps-live` is at `demo/07-complete` and `aps-walkthrough` exists.
+- [ ] `.\scripts\setup-demo.ps1` has run. `aps-live` is at `main` (preflight checks this) and `aps-walkthrough` exists.
 - [ ] `aps-data\.env` is filled in: `AOC_SESSION`, `AOC_CONTACT`, endpoints, deployment names, prices.
 - [ ] `az login` works on the presenter laptop with the account that holds the role assignments.
 - [ ] `.\scripts\preflight.ps1 -Days <range>` ends in **PASS**, and shows each of these:
