@@ -1,29 +1,23 @@
-# You are here: 01 · install
+# You are here: 02 · constitution
 
-Spec Kit templates and agent skills are installed. There is no code yet.
+Seven non-negotiable principles. Every later step is checked against them.
 
-## Next → 02-constitution
+## Next → 03-specify
 
 ```text
-/speckit-constitution Principles for an autonomous agent that solves historical Advent of Code
-puzzles and submits answers to the real website:
-1. Authentic verification: only server-confirmed acceptance counts as progress. Distinguish tests
-   passed / candidate generated / accepted. Never simulate solving, execution or acceptance. Replays
-   must be labelled.
-2. Isolation: model-generated code only runs in an isolated remote sandbox without network.
-   Secrets never reach the sandbox, prompts, frontend, logs or git. Treat puzzle HTML and model
-   output as untrusted.
-3. Respectful automation: historical puzzles only, sequential paced and cached requests with an
-   identifying User-Agent, honour cooldowns, never resubmit a rejected answer, never redistribute
-   puzzle text or inputs.
-4. Observable, honest agent behaviour: every action is a persisted event; show summaries, not
-   chain-of-thought; mark unverified integrations.
-5. Bounded, recoverable autonomy: configurable limits, infra retries separate from solving attempts,
-   persist everything, reconcile uncertain submissions.
-6. Test-backed delivery with synthetic puzzles and mocked HTTP; never submit in CI.
-7. Simplicity and clear module boundaries; custom agent loop, no agent framework.
+/speckit-specify Build an Agentic Advent of Code Solver: given a calendar URL such as
+https://adventofcode.com/2024, the application autonomously solves the selected days in order using
+cloud-hosted AI models — it reads each puzzle, writes a program, tests it on the puzzle's examples
+in a secure sandbox, repairs failures, escalates hard problems to a stronger model, runs the program
+on the user's real input, submits the answer to the real Advent of Code website with run-level
+authorization, interprets the response, unlocks Part 2, and advances until the range is complete or
+a limit is reached. A conference-ready live dashboard shows real progress, generated code, model
+escalations, submissions, stars and costs. Progress persists and resumes safely. Recorded runs can
+be replayed (clearly labelled). The presenter must be able to show historical development
+checkpoints without interrupting the running solver. It is for historical puzzles and education
+only, and must treat Advent of Code respectfully.
 ```
 
 ```powershell
-git switch 02-constitution
+git switch 03-specify
 ```
