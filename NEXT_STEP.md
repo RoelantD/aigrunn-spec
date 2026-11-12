@@ -1,13 +1,13 @@
-# You are here: 06 · tasks
+# You are here: 07 · analyze
 
-83 traceable tasks. There is still no code.
+Two HIGH issues were fixed as text, before any code existed.
 
-## Next → 07-analyze
+## Next → 08-implement
 
 ```text
-/speckit-analyze
+/speckit-implement
 ```
 
 ```powershell
-git switch 07-analyze
+git switch 08-implement
 ```

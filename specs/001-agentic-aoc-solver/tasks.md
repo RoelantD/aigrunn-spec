@@ -74,7 +74,7 @@ presenter docs in `demo/`.
 - [ ] T020 [P] [US1] Answer ledger tests (duplicate rejection, too-high/too-low bounds, non-numeric answers) in backend/tests/unit/test_ledger.py
 - [ ] T021 [P] [US1] Model adapter request/response mapping tests (Responses + Messages, usage parsing, JSON schema output, Messages format fallback) in backend/tests/integration/test_model_adapters.py
 - [ ] T022 [P] [US1] Dynamic Sessions executor tests with mocked pool endpoint (success, exception, timeout, 429 retry, wrapped-body fallback) in backend/tests/integration/test_dynamic_sessions.py
-- [ ] T023 [US1] E2E progression test (Scenario A + F) in backend/tests/e2e/test_progression.py
+- [ ] T023 [US1] E2E progression test (Scenario A + F; also asserts SC-006: ≤ ~10 website requests per day, all spaced ≥ min interval) in backend/tests/e2e/test_progression.py
 - [ ] T024 [US1] E2E repair test (Scenario B) in backend/tests/e2e/test_repair.py
 - [ ] T025 [US1] E2E wrong-answer test (Scenario D) in backend/tests/e2e/test_wrong_answer.py
 
@@ -84,14 +84,14 @@ presenter docs in `demo/`.
 - [ ] T027 [P] [US1] Implement response classification per contracts/aoc-client.md in backend/app/aoc/responses.py
 - [ ] T028 [US1] Implement AocClient (single lock, min interval default 5 s floor 1 s, UA with contact, cache dir `<APS_DATA_DIR>/cache/<year>/<day>/`, backoff for GET, no POST retry, UNCERTAIN on post-send network error) in backend/app/aoc/client.py
 - [ ] T029 [P] [US1] Implement ModelProvider protocol, ModelRequest/Response, errors, Azure token provider (scope https://ai.azure.com/.default) in backend/app/models/base.py and backend/app/models/auth.py
-- [ ] T030 [P] [US1] Implement ResponsesAdapter (Foundry v1 /responses, reasoning.effort, text.format json_schema, usage incl. reasoning tokens, infra retry) in backend/app/models/responses_adapter.py
+- [ ] T030 [P] [US1] Implement ResponsesAdapter (Foundry v1 /responses, reasoning.effort, text.format json_schema, usage incl. reasoning tokens, infra retry; reasoning items discarded, never persisted or displayed — FR-038) in backend/app/models/responses_adapter.py
 - [ ] T031 [P] [US1] Implement pricing/cost estimation from configured prices in backend/app/models/pricing.py
 - [ ] T032 [P] [US1] Implement harness generator/decoder per contracts/code-execution.md in backend/app/execution/harness.py
 - [ ] T033 [US1] Implement CodeExecutionService protocol and DynamicSessionsExecutor (api-version 2025-10-02-preview, fresh identifier per execution, scope https://dynamicsessions.io/.default) in backend/app/execution/base.py and backend/app/execution/dynamic_sessions.py
 - [ ] T034 [P] [US1] Implement example verification in backend/app/verification/examples.py
 - [ ] T035 [P] [US1] Implement answer ledger (account-wide rejected answers, bounds) in backend/app/verification/ledger.py
 - [ ] T036 [US1] Implement prompts (trusted system instructions, delimited untrusted puzzle, input shape preview, Part 1 context for Part 2, repair feedback) and SolutionProposal schema in backend/app/agents/prompts.py
-- [ ] T037 [US1] Implement Solver steps (analyze+generate, test, repair, execute input) emitting events and persisting attempts/revisions/results in backend/app/agents/solver.py
+- [ ] T037 [US1] Implement Solver steps (analyze+generate, test, repair, execute input, hardcoded-answer guard per plan.md) emitting events and persisting attempts/revisions/results in backend/app/agents/solver.py
 - [ ] T038 [US1] Implement Orchestrator state machine per plan.md (part loop, submission handling, Part 2 unlock, advance, FAILED→BLOCKED next part, Day 25 rule) in backend/app/agents/orchestrator.py
 - [ ] T039 [US1] Implement RunManager (create/start runs, one live run at a time, asyncio task lifecycle) in backend/app/agents/run_manager.py
 - [ ] T040 [US1] Implement run endpoints (create with authorization validation, start, progress, part detail, revisions, submissions) in backend/app/api/runs.py
@@ -109,7 +109,7 @@ presenter docs in `demo/`.
 
 ### Tests for User Story 2
 
-- [ ] T042 [P] [US2] SSE stream tests (ordering, Last-Event-ID resume, no duplicates, keep-alive) in backend/tests/integration/test_sse.py
+- [ ] T042 [P] [US2] SSE stream tests (ordering, Last-Event-ID resume, no duplicates, keep-alive, publish→receive latency < 2 s per SC-004) in backend/tests/integration/test_sse.py
 - [ ] T043 [P] [US2] Frontend tests: calendar state derivation (star only when verified), activity feed rendering, escalation banner in frontend/tests/
 
 ### Implementation for User Story 2
@@ -123,7 +123,7 @@ presenter docs in `demo/`.
 - [ ] T050 [P] [US2] Implement CodeInspector (syntax highlighting, revision history, execution results) in frontend/src/components/CodeInspector.tsx
 - [ ] T051 [P] [US2] Implement StatusHeader + Metrics panels in frontend/src/components/StatusHeader.tsx and frontend/src/components/MetricsPanel.tsx
 - [ ] T052 [US2] Implement Dashboard page in frontend/src/pages/Dashboard.tsx
-- [ ] T053 [US2] Implement Presentation page (large calendar, star count, current activity, model, compact code/exec, fullscreen toggle, demo clock) in frontend/src/pages/Presentation.tsx
+- [ ] T053 [US2] Implement Presentation page (large calendar, star count, current activity, model, compact code/exec, fullscreen toggle, demo clock; body text ≥ 24 px, star count ≥ 96 px per SC-010) in frontend/src/pages/Presentation.tsx
 
 **Checkpoint**: Dashboard shows a run live
 
@@ -137,7 +137,7 @@ presenter docs in `demo/`.
 
 - [ ] T054 [P] [US3] E2E escalation test (Scenario C) in backend/tests/e2e/test_escalation.py
 - [ ] T055 [P] [US3] Escalation policy unit tests (thresholds, timeout early escalation, effort ladder) in backend/tests/unit/test_policy.py
-- [ ] T056 [P] [US3] Implement MessagesAdapter (Claude Messages API on Foundry, anthropic-version, adaptive thinking, output_config.effort/format with fallback, refusal handling) in backend/app/models/messages_adapter.py
+- [ ] T056 [P] [US3] Implement MessagesAdapter (Claude Messages API on Foundry, anthropic-version, adaptive thinking, output_config.effort/format with fallback, refusal handling; thinking blocks discarded, never persisted or displayed — FR-038) in backend/app/models/messages_adapter.py
 - [ ] T057 [US3] Implement ModelRouter + escalation policy and handover summary builder in backend/app/models/router.py and backend/app/agents/policy.py
 - [ ] T058 [US3] Implement EscalationBanner (primary → escalation with reason) in frontend/src/components/EscalationBanner.tsx
 
