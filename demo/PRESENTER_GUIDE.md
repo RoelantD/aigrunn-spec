@@ -11,7 +11,7 @@ interfere. Run data lives in `aps-data`, outside both worktrees.
 ```text
 <parent>\agentic-puzzle-solver   development clone (main)
 <parent>\aps-live                A: main (= demo/07-complete + fixes from live verification) -> :8765, :5175
-<parent>\aps-walkthrough         B: demo/00 … demo/07 -> open in VS Code + GitHub Copilot
+<parent>\aps-walkthrough         B: branches 00-start … 10-working -> VS Code + GitHub Copilot
 <parent>\aps-data                .env (secrets), solver.db, cache\ (puzzle text + inputs)
 ```
 
