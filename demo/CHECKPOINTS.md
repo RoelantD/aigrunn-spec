@@ -7,11 +7,11 @@ into Copilot Chat, but don't send it), then switch to the branch that holds the 
 Nothing is generated live, so the talk is predictable.
 
 ```powershell
-.\scripts\show-checkpoint.ps1 -List          # all steps, current one marked
-.\scripts\show-checkpoint.ps1 02-constitution  # or: 2, or: constitution
-.\scripts\show-checkpoint.ps1 -Next          # one step forward (-Previous: back)
-.\scripts\return-to-complete.ps1             # back to 10-working
+git switch 02-constitution        # in aps-walkthrough, or use the VS Code branch picker
 ```
+
+`.\scripts\show-checkpoint.ps1` does the same with a few extras: `-List`, `-Next`, stashing local
+edits, and writing `.specify/feature.json`. Plain `git switch` is all you need on stage.
 
 | Step branch | Content = real stage | Prompt in its `NEXT_STEP.md` (leads to the next step) | Show on stage |
 |-------------|----------------------|------------------------------------------------------|---------------|
