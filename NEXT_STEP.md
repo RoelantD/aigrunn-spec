@@ -1,18 +1,13 @@
-# You are here: 05 · plan
+# You are here: 06 · tasks
 
-The how is written down, gated by the constitution.
+83 traceable tasks. There is still no code.
 
-## Next → 06-tasks
-
-```text
-/speckit-checklist Submission integrity and security: real answer submission, recovery after
-crashes, isolation and secret handling.
-```
+## Next → 07-analyze
 
 ```text
-/speckit-tasks
+/speckit-analyze
 ```
 
 ```powershell
-git switch 06-tasks
+git switch 07-analyze
 ```
