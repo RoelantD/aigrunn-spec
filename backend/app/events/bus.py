@@ -10,7 +10,7 @@ from typing import Any
 from sqlalchemy import select
 
 from app.persistence.db import Database
-from app.persistence.tables import Event
+from app.persistence.tables import Event, iso_utc
 from app.security import redact_obj
 
 
@@ -25,7 +25,7 @@ def event_to_dict(e: Event) -> dict[str, Any]:
         "message": e.message,
         "data": e.data or {},
         "replay": e.replay,
-        "created_at": e.created_at.isoformat() if isinstance(e.created_at, datetime) else e.created_at,
+        "created_at": iso_utc(e.created_at) if isinstance(e.created_at, datetime) else e.created_at,
     }
 
 

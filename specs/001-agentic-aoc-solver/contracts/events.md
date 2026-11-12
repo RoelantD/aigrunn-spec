@@ -29,7 +29,19 @@ contains secrets, cookies, tokens, or personal puzzle input.
 | `star.earned` | success | `{stars_total}` | CORRECT (drives star animation) |
 | `part.unlocked` | success | `{}` | Part 2 now available |
 | `budget.warning` | warning | `{spent_usd, limit_usd}` | 80% of budget |
+| `agent.step` | info | `{}` | human-readable step marker ("Loading puzzle…", "Unlocking Part 2") |
+| `exec.started` | info | `{revision, timeout_s}` | real-input execution begins |
+| `test.note` | warning | `{}` | an extracted example was discarded or judged unreliable |
+| `model.note` | warning | `{model_key}` | adapter adaptation (e.g. structured-output fallback) |
+| `part.failed` | error | `{reason}` | attempt or submission limit reached |
+| `part.skipped` | warning | `{}` | Day 25 final star not claimable |
+| `part.retry` | info | `{}` | operator reset a FAILED/BLOCKED/SKIPPED part |
 | `error` | error | `{kind: infra\|aoc\|internal, detail}` | unexpected failures (redacted) |
 
-Ordering: `id` is a global monotonically increasing integer; clients resume with `Last-Event-ID`.
+Ordering: `id` is a global monotonically increasing integer; clients resume with `Last-Event-ID`
+(or `?after_id=`).
+
+SSE framing: every event is sent with SSE field `id` = Event.id, SSE `event` = `message` (so a plain
+`EventSource.onmessage` handler receives all events) and `data` = the JSON object above; the event
+type is carried in `data.type`. Timestamps are ISO-8601 with an explicit UTC offset.
 Replayed events carry `replay: true` and belong to the replay run.

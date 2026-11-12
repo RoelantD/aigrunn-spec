@@ -182,18 +182,18 @@ presenter docs in `demo/`.
 - [X] T074 [P] [US7] Implement scripts/start-live-app.ps1 (+ .sh): start backend 8765 + frontend 5175 from aps-live with APS_DATA_DIR
 - [X] T075 [P] [US7] Implement scripts/show-checkpoint.ps1 and scripts/return-to-complete.ps1 (+ .sh): switch walkthrough worktree, refuse on uncommitted changes unless confirmed, set .specify/feature.json
 - [X] T076 [P] [US7] Implement scripts/preflight.ps1 (+ .sh) wrapping the CLI and git/worktree checks
-- [ ] T077 [US7] Install GitHub Copilot Spec Kit integration without changing the default integration and document it in demo/PRESENTER_GUIDE.md
+- [X] T077 [US7] Install GitHub Copilot Spec Kit integration without changing the default integration and document it in demo/PRESENTER_GUIDE.md
 
 ---
 
 ## Phase 10: Polish & Cross-Cutting Concerns
 
 - [X] T078 [P] Infrastructure: infra/main.bicep, infra/modules/*.bicep, infra/main.parameters.json, azure.yaml
-- [ ] T079 [P] Presenter docs: demo/PRESENTER_GUIDE.md, CHECKPOINTS.md, DEMO_SCRIPT_25_MIN.md, PREFLIGHT_CHECKLIST.md, TROUBLESHOOTING.md, REPLAY_GUIDE.md
-- [ ] T080 [P] ADRs for key decisions in docs/adr/
-- [ ] T081 [P] Secret-leak scan test across logs/events/API payloads (SC-009) in backend/tests/integration/test_no_secret_leaks.py
-- [ ] T082 Traceability matrix FR → code → tests in specs/001-agentic-aoc-solver/traceability.md
-- [ ] T083 Run full test suites, ruff, frontend build/lint; record results
+- [X] T079 [P] Presenter docs: demo/PRESENTER_GUIDE.md, CHECKPOINTS.md, DEMO_SCRIPT_25_MIN.md, PREFLIGHT_CHECKLIST.md, TROUBLESHOOTING.md, REPLAY_GUIDE.md
+- [X] T080 [P] ADRs for key decisions in docs/adr/
+- [X] T081 [P] Secret-leak scan test across logs/events/API payloads (SC-009) in backend/tests/integration/test_no_secret_leaks.py
+- [X] T082 Traceability matrix FR → code → tests in specs/001-agentic-aoc-solver/traceability.md
+- [X] T083 Run full test suites, ruff, frontend build/lint; record results
 
 ---
 
@@ -218,3 +218,22 @@ then T028 → T033 → T036 → T037 → T038 → T039 → T040/T041
 2. Add the dashboard (US2) — the demo becomes watchable.
 3. Add escalation and recovery (US3, US4) — the demo becomes robust.
 4. Replay, preflight, worktree tooling, docs (US5–US7, Polish) — the talk becomes reproducible.
+
+---
+
+## Phase 11: Convergence
+
+- [X] T084 Add docs/TESTING.md listing which tests ran against real cloud services and which integrations remain unverified per Constitution IV (missing)
+- [X] T085 Add an e2e test for the Day 25 final-star rule (claim with 49 stars, SKIPPED otherwise) per FR-022 (partial)
+- [X] T086 After a real-input timeout, run the next attempt's real input with exec_timeout_max_s so the configurable maximum is actually used per FR-004 (partial)
+- [X] T087 Align contracts/events.md with the implemented SSE framing (event name "message", type carried in data) per FR-031 (contradicts)
+- [X] T088 Preserve trailing whitespace inside verified example inputs instead of right-stripping lines per FR-009 (partial)
+- [X] T089 Add per-part latency to the metrics endpoint per FR-037 (partial)
+- [X] T090 Assert per-event publish-to-receive latency below 2 s in the SSE test per SC-004 (partial)
+
+---
+
+## Phase 12: Convergence
+
+- [X] T091 Raise presentation-view activity text to at least 24 px (currently 20 px) per SC-010 (partial)
+- [X] T092 Document the emitted event types agent.step, exec.started, test.note, model.note, part.failed, part.skipped, part.retry in contracts/events.md per FR-030 (partial)

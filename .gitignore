@@ -38,3 +38,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Spec Kit catalog cache
+.specify/integrations/.cache/

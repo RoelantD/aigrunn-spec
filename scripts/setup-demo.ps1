@@ -40,7 +40,7 @@ try {
     if (Test-Path $LiveDir) {
         Write-Ok "exists; current HEAD: $(git -C $LiveDir describe --tags --always)"
     } else {
-        git worktree add --detach $LiveDir $LiveRef | Out-Host
+        git worktree add --quiet --detach $LiveDir $LiveRef
         Write-Ok "created"
     }
 
@@ -49,7 +49,7 @@ try {
         Write-Ok "exists; current HEAD: $(git -C $WalkDir describe --tags --always)"
     } else {
         $start = if (git tag --list 'demo/00-initial') { 'demo/00-initial' } else { 'HEAD' }
-        git worktree add --detach $WalkDir $start | Out-Host
+        git worktree add --quiet --detach $WalkDir $start
         Write-Ok "created"
     }
 } finally { Pop-Location }

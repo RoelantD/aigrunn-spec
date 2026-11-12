@@ -13,6 +13,13 @@ def utcnow() -> datetime:
     return datetime.now(UTC)
 
 
+def iso_utc(dt: datetime | None) -> str | None:
+    """Serialize as explicit UTC (SQLite drops tzinfo; clients must not read times as local)."""
+    if dt is None:
+        return None
+    return (dt if dt.tzinfo else dt.replace(tzinfo=UTC)).isoformat()
+
+
 class Base(DeclarativeBase):
     pass
 

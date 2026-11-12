@@ -26,6 +26,12 @@ def test_examples_verbatim_and_reliability():
     assert any("not found verbatim" in n for n in notes)
 
 
+def test_examples_keep_trailing_whitespace():
+    text = "ab  \n c \n"
+    ok, _ = verify_examples([{"input": text, "expected_output": None, "note": ""}], [text], [], "")
+    assert ok[0].input == text
+
+
 def test_ledger_duplicates_and_bounds():
     led = AnswerLedger()
     led.record("100", SubmissionOutcome.TOO_HIGH)

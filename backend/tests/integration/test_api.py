@@ -4,6 +4,7 @@ import asyncio
 import json
 import socket
 import time
+from datetime import datetime
 
 import httpx
 import pytest
@@ -47,6 +48,7 @@ async def _read_sse(base: str, path: str, headers: dict, until_type: str, sink: 
                 if line.startswith("data: "):
                     ev = json.loads(line[6:])
                     ev["_received"] = time.monotonic()
+                    ev["_wall"] = time.time()
                     sink.append(ev)
                     if ev["type"] == until_type:
                         return
@@ -78,7 +80,9 @@ async def test_full_run_over_http_with_sse_and_resume(server):
     ids = [e["id"] for e in events]
     assert ids == sorted(ids) and len(ids) == len(set(ids))
     assert any(e["type"] == "star.earned" for e in events)
-    # SC-004: events are delivered promptly (whole run with fakes is far below 2 s per event)
+    # SC-004: every event reaches the client within 2 s of being created.
+    for e in [e for e in events if e["type"] != "run.created"]:
+        assert e["_wall"] - datetime.fromisoformat(e["created_at"]).timestamp() < 2.0, e["type"]
     assert events[-1]["_received"] - t_start < 10
 
     # Resume from the middle with Last-Event-ID: only later events, no duplicates.

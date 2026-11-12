@@ -108,7 +108,7 @@ class Settings(BaseSettings):
     @field_validator("foundry_openai_base_url", "foundry_anthropic_base_url", "sessions_pool_endpoint")
     @classmethod
     def _validate_urls(cls, v: str | None) -> str | None:
-        if v is None or v.strip() == "":
+        if v is None or v.strip() == "" or "<" in v:  # empty or still the .env.example placeholder
             return None
         return validate_service_url(v.strip()).rstrip("/")
 

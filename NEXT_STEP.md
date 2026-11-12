@@ -1,13 +1,16 @@
-# You are here: 08 · implement
+# You are here: 09 · converge
 
-The app exists and its tests pass. Does it keep every promise in the spec?
+The spec and the code agree. Every requirement traces to code and to a test.
 
-## Next → 09-converge
+## Next → 10-working
 
-```text
-/speckit-converge
+```powershell
+azd provision
+cd backend
+uv run python cli.py preflight --days 1-5
+uv run pytest -m live_azure tests/live
 ```
 
 ```powershell
-git switch 09-converge
+git switch 10-working
 ```
