@@ -1,0 +1,9 @@
+# Azure Developer CLI: provisions Foundry deployments + Dynamic Sessions pool only.
+# The app runs locally (scripts/start-live-app.ps1). `azd provision` never deploys code.
+name: agentic-puzzle-solver
+metadata:
+  template: agentic-puzzle-solver@1.0.0
+infra:
+  provider: bicep
+  path: infra
+  module: main

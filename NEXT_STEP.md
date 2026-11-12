@@ -1,13 +1,13 @@
-# You are here: 07 · analyze
+# You are here: 08 · implement
 
-Two HIGH issues were fixed as text, before any code existed.
+The app exists and its tests pass. Does it keep every promise in the spec?
 
-## Next → 08-implement
+## Next → 09-converge
 
 ```text
-/speckit-implement
+/speckit-converge
 ```
 
 ```powershell
-git switch 08-implement
+git switch 09-converge
 ```
